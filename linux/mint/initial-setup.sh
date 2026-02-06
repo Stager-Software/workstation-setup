@@ -100,8 +100,7 @@ else
     sudo mkdir -p "$TOOLBOX_OPT_DIR"
 
     info "Downloading and extracting IntelliJ Toolbox to /opt..."
-    curl -L "$TOOLBOX_URL" -o "$TEMP_DIR/toolbox.tar.gz"
-    sudo tar -xzf "$TEMP_DIR/toolbox.tar.gz" -C "$TOOLBOX_OPT_DIR" --strip-components=1
+    curl -sL "$TOOLBOX_URL" | sudo tar -xz -C "$TOOLBOX_OPT_DIR" --strip-components=1
 
     if [[ -x "$TOOLBOX_BINARY" ]]; then
         info "Initializing Toolbox..."
@@ -116,6 +115,7 @@ else
 fi
 
 ## --- INSTALL DOCKER ENGINE & DOCKER COMPOSE ---
+
 
 ## -- FIN --
 info "Setup done - please restart the device and validate shell as well as swap persistance"
