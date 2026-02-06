@@ -93,7 +93,7 @@ TOOLBOX_OPT_DIR="/opt/jetbrains-toolbox"
 TOOLBOX_BINARY="$TOOLBOX_OPT_DIR/bin/jetbrains-toolbox"
 TOOLBOX_URL="https://data.services.jetbrains.com/products/download?platform=linux&code=TBA"   
 
-if [[ -d "$TOOLBOX_BINARY"]]; then
+if [[ -f "$TOOLBOX_BINARY" ]]; then
     info "IntelliJ Toolbox is already installed at $TOOLBOX_OPT_DIR. Skipping."
 else 
     info "IntelliJ Toolbox not found. Installing to /opt..."
