@@ -1,4 +1,7 @@
 # Swap
+
+> **_NOTE:_** This is now handled by our [setup script](/linux/mint/initial-setup.sh). If you machine was set up using the script, this readme is no longer relevant and can be skipped. 
+
 Linux Mint might install with just a 2 gigabytes swap partition by default. We prefer to have a bit more - generally the same amount of swap as the RAM that the machine has.
 
 To check this, run the following: 

@@ -48,3 +48,12 @@ rather keep this functionality. To set this up, open up Timeshift and click on *
 - For snapshot levels, select whatever you feel like. Daily snapshots feels best for me. Keeping 5 means you have a full workweek of backups in case a random update or incorrect install bricks the device.
 - For user home directories, stick with the default and exclude everything.
 - Finish and exit Timeshift.
+
+## Intial setup
+After the system has been installed, the [setup script](/linux/mint/initial-setup.sh) can be ran to handle
+some basic tasks such as installing frequently used tools (git, npm) and some required setup (correct SWAP space, 
+installing and setting up both IntelliJ IDEA as well as docker and docker-compose)
+
+```sh
+bash <(curl -s https://raw.githubusercontent.com/Stager-Software/workstation-setup/refs/heads/main/linux/mint/initial-setup.sh)
+```

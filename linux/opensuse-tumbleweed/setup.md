@@ -1,7 +1,7 @@
 # OpenSUSE Tumbleweed
 
 ## Intial setup
-After the system has been installed, the [setup script](scripts/initial-setup.sh) can be ran to handle
+After the system has been installed, the [setup script](/linux/opensuse-tumbleweed/initial-setup.sh) can be ran to handle
 some basic tasks such as installing frequently used applications (chrome, vlc, gear-lever) and utilities
 (google fonts, codecs). Run the script using the following command:
 
