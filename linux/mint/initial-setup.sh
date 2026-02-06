@@ -89,33 +89,33 @@ else
 fi
 
 ## --- INSTALL JETBRAINS TOOLBOX ---
-# Commented out as this is for some reason not working correctly
-# TOOLBOX_INSTALL_DIR="$HOME/.local/share/JetBrains/Toolbox"
-# if [[ -d "$TOOLBOX_INSTALL_DIR" ]]; then
-#     info "IntelliJ Toolbox is already installed at $TOOLBOX_INSTALL_DIR. Skipping."
-# else
-#     info "IntelliJ Toolbox not found. Starting installation..."
+TOOLBOX_OPT_DIR="/opt/jetbrains-toolbox"
+TOOLBOX_BINARY="$TOOLBOX_OPT_DIR/bin/jetbrains-toolbox"
+TOOLBOX_URL="https://data.services.jetbrains.com/products/download?platform=linux&code=TBA"   
 
-#     TOOLBOX_URL="https://data.services.jetbrains.com/products/download?platform=linux&code=TBA"
-#     TOOLBOX_EXTRACT_DIR="$TEMP_DIR/toolbox_files"
-#     TOOLBOX_INSTALLER_BIN="$TOOLBOX_EXTRACT_DIR/bin/jetbrains-toolbox"
-    
-#     mkdir -p "$TOOLBOX_EXTRACT_DIR"
-    
-#     info "Downloading and extracting JetBrains Toolbox..."
-#     curl -L "$TOOLBOX_URL" -o "$TEMP_DIR/toolbox.tar.gz"
-#     tar -xzf "$TEMP_DIR/toolbox.tar.gz" -C "$TOOLBOX_EXTRACT_DIR" --strip-components=1
-    
-#     if [[ -x "${TOOLBOX_INSTALLER_BIN:-}" ]]; then
-#         info "Launching installer..."
-#         "$TOOLBOX_EXTRACT_DIR/bin/jetbrains-toolbox" >/dev/null 2>&1 &
-#         disown
-#         info "Installer is running in the background. You'll see the Toolbox window shortly!"
-#     else
-#         error "Could not find the installer binary at $TOOLBOX_INSTALLER_BIN."
-#         exit 1
-#     fi
-# fi
+if [[ -d "$TOOLBOX_BINARY"]]; then
+    info "IntelliJ Toolbox is already installed at $TOOLBOX_OPT_DIR. Skipping."
+else 
+    info "IntelliJ Toolbox not found. Installing to /opt..."
+    sudo mkdir -p "$TOOLBOX_OPT_DIR"
+
+    info "Downloading and extracting IntelliJ Toolbox to /opt..."
+    curl -L "$TOOLBOX_URL" -o "$TEMP_DIR/toolbox.tar.gz"
+    sudo tar -xzf "$TEMP_DIR/toolbox.tar.gz" -C "$TOOLBOX_OPT_DIR" --strip-components=1
+
+    if [[ -x "$TOOLBOX_BINARY" ]]; then
+        info "Initializing Toolbox..."
+        "$TOOLBOX_BINARY" >/dev/null 2>&1 &
+        disown
+        
+        info "IntelliJ Toolbox installed. It might open in the background to finalize setup."
+    else
+        error "Failed to find the binary at $TOOLBOX_BINARY after extraction."
+        exit 1
+    fi
+fi
+
+## --- INSTALL DOCKER ENGINE & DOCKER COMPOSE ---
 
 ## -- FIN --
 info "Setup done - please restart the device and validate shell as well as swap persistance"
