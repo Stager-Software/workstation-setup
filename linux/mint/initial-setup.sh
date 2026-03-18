@@ -11,12 +11,13 @@ function error() { echo -e "\e[1;31m[ERROR]\e[0m $*"; }
 
 # --- INSTALL SOME DEFAULT PACKAGES ---
 sudo apt update
-sudo apt install -y git make npm curl zsh wget ca-certificates gnupg
+sudo apt install -y git make npm curl zsh wget ca-certificates gnupg jq
 
 # --- REMOVE CLASHING RMT PACKAGE ---
-# Mint comes with a mega old RMT (Remove Magnetic Tape Server) package.
-# This clashes with out own RMT tool. As it will never be used, we can delete it.
-# It is not linked to any package manager, so we just delete it by removing the binary.
+# Mint comes with a mega old RMT (Remote Magnetic Tape Server) package.
+# This clashes with our own RMT (Release Management Tool). As it will 
+# never be used, we can delete it. It is not linked to any package 
+# manager, so we just delete it by removing the binary.
 sudo rm -f /usr/sbin/rmt
 
 # --- CONFIG ZSH & OMZ ---
@@ -91,7 +92,6 @@ fi
 TOOLBOX_OPT_DIR="/opt/jetbrains-toolbox"
 TOOLBOX_BINARY="$TOOLBOX_OPT_DIR/bin/jetbrains-toolbox"
 TOOLBOX_URL="https://data.services.jetbrains.com/products/download?platform=linux&code=TBA"   
-
 if [[ -f "$TOOLBOX_BINARY" ]]; then
     info "IntelliJ Toolbox is already installed at $TOOLBOX_OPT_DIR. Skipping."
 else 
@@ -108,6 +108,39 @@ else
         info "IntelliJ Toolbox installed. It might open in the background to finalize setup."
     else
         error "Failed to find the IntelliJ Toolbox binary at $TOOLBOX_BINARY after extraction."
+        exit 1
+    fi
+fi
+
+# --- INSTALL AWS CLI & AWS SESSION MANAGER PLUGIN ---
+if command -v aws > /dev/null 2>&1; then
+    info "AWS CLI is already installed. Skipping."
+else
+    info "AWS CLI not found. Installing..."
+
+    curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "$TEMP_DIR/awscliv2.zip"
+    unzip -q "$TEMP_DIR/awscliv2.zip" -d "$TEMP_DIR"
+    info "Running AWS installation script..."
+    sudo "$TEMP_DIR/aws/install" --update
+
+    if aws --version > /dev/null 2>&1; then
+        info "AWS CLI installed successfully: $(aws --version)"
+    else
+        error "AWS CLI installation failed."
+        exit 1
+    fi
+fi
+
+if command -v session-manager-plugin >/dev/null 2>&1; then
+    info "AWS Session Manager Plugin is already installed. Skipping."
+else
+    info "AWS Session Manager Plugin not found. Installing..."
+    curl -sL "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" | sudo dpkg -i -
+
+    if session-manager-plugin --version > /dev/null 2>&1; then
+        info "AWS Session Manager Plugin installed successfully: $(session-manager-plugin --version)"
+    else
+        error "AWS Session Manager Plugin installation failed."
         exit 1
     fi
 fi

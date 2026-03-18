@@ -21,7 +21,7 @@
 8. You will be prompted to enter a **security key** and a **recovery key**.
 	1. For **security key**, enter your encryption password.
 		-  **NOTE**: If you are installing a laptop for someone else, you can put a temporary password here, just remember to change it afterwards.
-	2. For the **recovery key**, enable it and let the installer generate a secure key. Make sure this is saved in `home/mind/recovery.key` which should be the default.
+	2. For the **recovery key**, enable it and let the installer generate a secure key. Make sure this is saved in `home/mint/recovery.key` which should be the default.
 
 9. Click on **Install Now** and allow the installer to decide your partitions.
 	1. This will most likely result in a swap partition of just 2 gigabytes. We will increase this later, as the advanced partition manager is quite a pain in the ass to do this in.
