@@ -181,6 +181,19 @@ else
     exit 1
 fi
 
+# --- SETUP DOCKER SERVICE OVERRIDES ---
+info "Applying overrides for Docker systemd service..."
+sudo mkdir -p /etc/systemd/system/docker.service.d
+cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/override.conf > /dev/null
+[Service]
+ExecStartPre=/bin/sleep 5
+
+[Unit]
+After=home.mount
+Requires=home.mount
+EOF
+sudo systemctl daemon-reload
+
 
 # -- FIN --
 info "Setup done - please restart the device and validate shell as well as swap persistance"
