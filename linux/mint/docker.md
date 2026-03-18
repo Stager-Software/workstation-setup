@@ -6,20 +6,19 @@ Linux Mint sometimes fails to start some of our Docker images, throwing a `Conne
 
 A temporary workaround for the current session is just restarting the images either by doing `docker-compose up` or `make services-restart` in the monolith repository. When you encounter the error, the `/home` partition is most definitely already mounted, so this restart does not throw any errors and starts the images succesfully.
 
-There is also a more permanent fix. For this, first run `sudo systemctl edit docker.service`. Then, paste the following in the editor. Pay attention to the comments in the `docker.service` file. You need to paste this in the correct place - somewhere at the start of the file.
+There is also a more permanent fix. For this, first run `sudo systemctl edit docker.service`. Next, paste the below settings in the editor, save and exit.
+> **_NOTE:_** Pay attention to the comments in the `docker.service` file. You need to paste this in the correct place - somewhere at the start of the file.
 ```sh
 [Service]
 ExecStartPre=/bin/sleep 5
 
 [Unit]
 After=home.mount
-Requires=home.mount
 ```
-
 The `After` entry tells `systemd` that the Docker service can not start unless `/home` is mounted, resolving the race condition that was happening. The `ExecStartPre` is an additional safety for this, as there might be a small delay between the system reporting `/home` as mounted and it actually being 
-fully mounted and settled. The `Requires` tells `systemd` to not try to start at all if `/home` is not mounted. 
+fully mounted and settled. 
 
-Save and exit this file and then apply the changes and restart the `docker.service`
+Finally apply the changes and restart the `docker.service` by running the following:
 ```
 sudo systemctl daemon-reload
 sudo systemctl restart docker.service

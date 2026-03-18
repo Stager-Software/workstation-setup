@@ -190,7 +190,6 @@ ExecStartPre=/bin/sleep 5
 
 [Unit]
 After=home.mount
-Requires=home.mount
 EOF
 sudo systemctl daemon-reload
 
