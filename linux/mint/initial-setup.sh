@@ -186,7 +186,7 @@ info "Applying overrides for Docker systemd service..."
 sudo mkdir -p /etc/systemd/system/docker.service.d
 cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/override.conf > /dev/null
 [Service]
-ExecStartPre=/bin/sleep 5
+ExecStartPre=/bin/sleep 10
 
 [Unit]
 After=home.mount
