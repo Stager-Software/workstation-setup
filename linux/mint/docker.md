@@ -10,7 +10,7 @@ There is also a more permanent fix. For this, first run `sudo systemctl edit doc
 > **_NOTE:_** Pay attention to the comments in the `docker.service` file. You need to paste this in the correct place - somewhere at the start of the file.
 ```sh
 [Service]
-ExecStartPre=/bin/sleep 5
+ExecStartPre=/bin/sleep 10
 
 [Unit]
 After=home.mount
