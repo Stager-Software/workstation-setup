@@ -1,0 +1,87 @@
+# Fixing networking issues
+
+During our time working with Linux, we have encountered a few networking issues on various machines and
+distros. Luckily, they're relatively easy to fix. This readme documents two of the issues together with 
+permanent fixes for both of them.
+
+## No networking at all randomly after booting the machine
+
+This issue is most likely caused by the NetworkManager seemingly not starting (or crashing for some 
+reason) right after boot. This is a relatively old issue that we did not debug much to find the root 
+cause, but did manage to find a fix for.  
+
+The fix is as simple as restarting the `NetworkManager` service by doing the following:
+```
+sudo systemctl restart NetworkManager.service
+```
+
+At this point, your networking should have already reconnected. This is not permanent though, so your 
+are not done yet. You can make it permanent by adding command this as a service that is ran on boot. 
+First, you have to create the service file: `touch /etc/systemd/system/restart-networkmanager-on-boot.service`
+
+Then edit the freshly created file and add the following to it:
+```
+[Unit]
+Description=Restart NetworkManager on boot
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl restart NetworkManager.service
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+```
+
+This service makes sure that the `ExecStart` step (so the `NetworkManager` restart) is ran once and
+exited (`Type=oneshot`) during the boot-up sequence (`WantedBy=multi-user.target` which more specifically
+means when the system is ready to log in). The `After=network.target` means that this is also ran after
+the system has already tried to run other networking related tasks.
+
+Finally, enable the service by running `sudo systemctl enable restart-networkmanager-on-boot.service`.
+
+## No WiFi after waking from sleep
+
+The second issue is caused by the WiFi module crashing (or being disabled but not re-enabled) after
+waking from sleep. The fix for this is identifying the WiFi module and making sure it is re-enabled 
+after sleep.
+
+First, we have to find the WiFi module. Do this by running `lspci -knn | grep -A3 -i net`. This should
+result in something like this in your terminal:
+```
+00:14.3 Network controller [0280]: Intel Corporation Meteor Lake PCH CNVi WiFi [8086:7e40] (rev 20)
+	Subsystem: Intel Corporation Wi-Fi 6E AX211 160MHz [8086:0094]
+	Kernel driver in use: iwlwifi
+	Kernel modules: iwlwifi
+```
+
+In this case, the WiFi module is `iwlwifi`. This will almost always be the case for Intel devices, but could 
+differ. For AMD devices, it could be `mt7921e` or even something else. We will keep using `iwlwifi` for this
+example. 
+
+Next, remove and add back the module by running the following: `sudo modprobe -r iwlwifi && sudo modprobe iwlwifi`. 
+If this works, you can make it permanent by creating a script that is ran every time the device wakes from sleep. 
+First, you have to create the script itself in the `systemd/system-sleep` directory: 
+`touch /usr/lib/systemd/system-sleep/iwlwifi.sleep`.
+
+Then edit the freshly created script and add the following to it:
+```bash
+#!/bin/bash
+case $1 in
+    pre)  /usr/sbin/modprobe -r iwlwifi ;;
+    post) /usr/sbin/modprobe iwlwifi ;;
+esac
+```
+
+The script is quite simple - `$1` is a signal that is passed to the script when ran. It's ran multiple
+time suring the sleep process. The script catches two steps in said process, distinguishable by the `pre`
+and `post` branches. The `pre` branch happens before the system enters sleep. In this branch, we remove
+the WiFi module manually. The `post` branch is done the moment the system is woken up from sleep. In this
+branch, the module is 'loaded' back in the system and re-initialized.
+
+Finally, make the script executable and owned by root: 
+```
+sudo chmod +x /usr/lib/systemd/system-sleep/iwlwifi.sleep
+sudo chown root:root /usr/lib/systemd/system-sleep/iwlwifi.sleep
+```
