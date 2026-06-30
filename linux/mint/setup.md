@@ -18,7 +18,7 @@
 9. Click on **Install Now** and allow the installer to decide your partitions.
 	1. This will most likely result in a swap partition of just 2 gigabytes. We will increase this later, as the advanced partition manager is quite a pain in the ass to do this in.
 10. Enter your name, password and username.
-	1. Enable **Require my password to log in** and also check **Encrypt my home folder**.
+	1. Enable **Require my password to log in** ~~and also check **Encrypt my home folder**~~[^1].
 	2. Click **Continue**.
 11. The system should now install. Wait for this to complete.
 	1. When done, you will be prompted to either continue testing or restart to finish the installation. Here, choose to continue testing and find the `recovery.key` that you previously saved. Save this in 1Password in case it is ever needed. Then delete the file from your laptop and restart the system (it is usually deleted right away after restarting out of the testing mode, but you can never be too sure).
@@ -27,6 +27,10 @@
 		2. **Driver manager** to install any drivers that are still missing.
 		3. **Firewall** to enable the firewall and change it to the office rule.
     	4. **Timeshift** to enable filesystem backups and make sure they are saved to the correct drive. Check the [Timeshift section](#timeshift) for more info on this.
+
+[^1]: Encrypting the home folder is not recommended, as this also means there is a file name length limit. Normally, this is not a problem, but when working with Stager and automated tests, we sometimes get built test classes with extremely long names. These 
+then throw vague `Permission denied` errors. For current laptops, the recommended fix is moving the repository out of the `home` directory. Something like `opt` will work for example. A different fix would be removing the encryption from the `home` directory.
+This means backing up the `home` directory, then deleting it + any `ecryptfs` stuff (config and packages) from your machine using a different user account. Then, the backup can be restored and the home directory should no longer be encrypted.
 
 ## TimeShift
 Linux Mint comes bundled with Timeshift, a utility used for creating and managing system snapshots. If left unchanged, Timeshift for some reason defaults its backup location to a 1GB partition and runs full within a day. Backups are cool though, so we would 
